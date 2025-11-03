@@ -45,4 +45,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the predictions for the user
+     */
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class);
+    }
 }
