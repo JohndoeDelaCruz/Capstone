@@ -22,7 +22,7 @@ class CropPredictionController extends Controller
     {
         try {
             $options = $this->predictionService->getAvailableOptions();
-            return view('predictions.index', compact('options'));
+            return view('farmers.predictions.index', compact('options'));
         } catch (\Exception $e) {
             return back()->with('error', 'Unable to load prediction form: ' . $e->getMessage());
         }
@@ -171,7 +171,7 @@ class CropPredictionController extends Controller
             ->distinct()
             ->pluck('municipality');
 
-        return view('predictions.history', compact('predictions', 'crops', 'municipalities'));
+        return view('farmers.predictions.history', compact('predictions', 'crops', 'municipalities'));
     }
 
     /**

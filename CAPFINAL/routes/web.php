@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CropPredictionController;
+use App\Http\Controllers\CropDataController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/batch-predict', [CropPredictionController::class, 'batchPredict'])->name('predictions.batch');
         Route::get('/history', [CropPredictionController::class, 'history'])->name('predictions.history');
         Route::get('/options', [CropPredictionController::class, 'getOptions'])->name('predictions.options');
+    });
+
+    // Crop Data Management routes
+    Route::prefix('crop-data')->name('crop-data.')->group(function () {
+        Route::get('/', [CropDataController::class, 'index'])->name('index');
+        Route::post('/import', [CropDataController::class, 'import'])->name('import');
+        Route::post('/store', [CropDataController::class, 'store'])->name('store');
+        Route::delete('/{id}', [CropDataController::class, 'destroy'])->name('destroy');
+        Route::post('/delete-all', [CropDataController::class, 'deleteAll'])->name('delete-all');
+        Route::get('/statistics', [CropDataController::class, 'getStatistics'])->name('statistics');
     });
 });
 require __DIR__.'/auth.php';

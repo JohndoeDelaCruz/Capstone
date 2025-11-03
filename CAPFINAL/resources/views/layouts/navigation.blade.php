@@ -1,24 +1,30 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-green-700 border-b border-green-800">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18.5c-4.03-1.21-7-5.35-7-9.5V8.52l7-3.12 7 3.12V11c0 4.15-2.97 8.29-7 9.5z"/>
+                        </svg>
+                        <span class="text-white font-bold text-lg">BenguetCropMap</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-green-200">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('predictions.predict.form')" :active="request()->routeIs('predictions.*')">
+                    <x-nav-link :href="route('crop-data.index')" :active="request()->routeIs('crop-data.*')" class="text-white hover:text-green-200">
+                        {{ __('Crop Data') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('predictions.predict.form')" :active="request()->routeIs('predictions.*')" class="text-white hover:text-green-200">
                         {{ __('Predictions') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('predictions.history')" :active="request()->routeIs('predictions.history')">
+                    <x-nav-link :href="route('predictions.history')" :active="request()->routeIs('predictions.history')" class="text-white hover:text-green-200">
                         {{ __('History') }}
                     </x-nav-link>
                 </div>
@@ -28,7 +34,7 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-500 focus:outline-none transition ease-in-out duration-150">
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ms-1">
