@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CropPredictionController;
 use App\Http\Controllers\CropDataController;
+use App\Http\Controllers\MapController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,5 +38,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/delete-all', [CropDataController::class, 'deleteAll'])->name('delete-all');
         Route::get('/statistics', [CropDataController::class, 'getStatistics'])->name('statistics');
     });
+
+    // Interactive Map route
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
 });
 require __DIR__.'/auth.php';
