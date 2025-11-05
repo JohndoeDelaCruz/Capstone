@@ -206,4 +206,36 @@ class CropPredictionController extends Controller
             'message' => 'Batch prediction job queued successfully. You will see results in your prediction history.'
         ]);
     }
+    
+    /**
+     * Generate multi-year forecast
+     */
+    public function forecast(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'municipality' => 'required|string',
+            'crop' => 'required|string',
+            'farm_type' => 'nullable|string',
+            'forecast_years' => 'required|integer|min:1|max:10'
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
+        try {
+            // Make forecast via ML API
+            $result = $this->predictionService->forecast($request->all());
+            
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

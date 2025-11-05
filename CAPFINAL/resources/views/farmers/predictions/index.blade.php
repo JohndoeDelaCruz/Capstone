@@ -1,15 +1,42 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Crop Production Prediction') }}
+            {{ __('Crop Production Prediction & Forecasting') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form id="predictionForm">
+            
+            <!-- Tab Navigation -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="flex -mb-px" aria-label="Tabs">
+                        <button type="button" onclick="switchTab('prediction')" id="tab-prediction"
+                            class="tab-button active w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                            <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Single Year Prediction
+                            <span class="block text-xs text-gray-500 mt-1">For historical or current year (2015-2024)</span>
+                        </button>
+                        <button type="button" onclick="switchTab('forecast')" id="tab-forecast"
+                            class="tab-button w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                            <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            Multi-Year Forecast
+                            <span class="block text-xs text-gray-500 mt-1">For future years (2025-2030+)</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Prediction Tab Content -->
+            <div id="prediction-content" class="tab-content">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900">
+                        <form id="predictionForm">
                         @csrf
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,10 +156,155 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <!-- Forecast Tab Content -->
+            <div id="forecast-content" class="tab-content hidden">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900">
+                        <!-- Info Banner -->
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700">
+                                        <strong>Multi-Year Forecast</strong> uses time-series analysis to predict production trends for future years (2025-2030). 
+                                        This is more accurate for future predictions than single-year predictions.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="forecastForm">
+                            @csrf
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Municipality -->
+                                <div>
+                                    <label for="forecast_municipality" class="block text-sm font-medium text-gray-700">Municipality</label>
+                                    <select id="forecast_municipality" name="municipality" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                        <option value="">Select Municipality</option>
+                                        @foreach($options['municipalities'] ?? [] as $municipality)
+                                            <option value="{{ $municipality }}">{{ $municipality }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Crop -->
+                                <div>
+                                    <label for="forecast_crop" class="block text-sm font-medium text-gray-700">Crop</label>
+                                    <select id="forecast_crop" name="crop" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                        <option value="">Select Crop</option>
+                                        @foreach($options['crops'] ?? [] as $crop)
+                                            <option value="{{ $crop }}">{{ $crop }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Forecast Years (Info only - Python API returns all available) -->
+                                <div>
+                                    <label for="forecast_years" class="block text-sm font-medium text-gray-700">Forecast Period</label>
+                                    <select id="forecast_years" name="forecast_years" required disabled
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100">
+                                        <option value="2" selected>Available Years (Auto)</option>
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500">Based on pre-generated forecast data</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <button type="submit" id="forecastBtn"
+                                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50">
+                                    <span id="forecastBtnText">Generate Forecast</span>
+                                    <svg id="forecastSpinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Forecast Results Section -->
+                        <div id="forecastResults" class="mt-8 hidden">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-900">Forecast Results</h3>
+                            <div id="forecastContent" class="space-y-4">
+                                <!-- Forecast results will be displayed here -->
+                            </div>
+                        </div>
+
+                        <!-- Forecast Error Section -->
+                        <div id="forecastError" class="mt-8 hidden">
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800">Error</h3>
+                                        <div id="forecastErrorMessage" class="mt-2 text-sm text-red-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <style>
+        .tab-button {
+            border-color: transparent;
+            color: #6B7280;
+            transition: all 0.2s;
+        }
+        .tab-button:hover {
+            color: #374151;
+            border-color: #D1D5DB;
+        }
+        .tab-button.active {
+            color: #4F46E5;
+            border-color: #4F46E5;
+        }
+        .tab-content {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
     <script>
+        // Tab Switching Function
+        function switchTab(tab) {
+            const predictionTab = document.getElementById('tab-prediction');
+            const forecastTab = document.getElementById('tab-forecast');
+            const predictionContent = document.getElementById('prediction-content');
+            const forecastContent = document.getElementById('forecast-content');
+
+            if (tab === 'prediction') {
+                predictionTab.classList.add('active');
+                forecastTab.classList.remove('active');
+                predictionContent.classList.remove('hidden');
+                forecastContent.classList.add('hidden');
+            } else {
+                forecastTab.classList.add('active');
+                predictionTab.classList.remove('active');
+                forecastContent.classList.remove('hidden');
+                predictionContent.classList.add('hidden');
+            }
+        }
+
+        // Prediction Form Handler
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -156,6 +328,19 @@
             try {
                 const formData = new FormData(this);
                 
+                const requestPayload = {
+                    municipality: formData.get('municipality'),
+                    farm_type: formData.get('farm_type'),
+                    year: parseInt(formData.get('year')),
+                    month: parseInt(formData.get('month')),
+                    crop: formData.get('crop'),
+                    area_planted: parseFloat(formData.get('area_planted')),
+                    area_harvested: parseFloat(formData.get('area_harvested')),
+                    productivity: parseFloat(formData.get('productivity')),
+                };
+                
+                console.log('Sending request:', requestPayload); // Debug log
+                
                 const response = await fetch('{{ route('predictions.predict') }}', {
                     method: 'POST',
                     headers: {
@@ -163,16 +348,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        municipality: formData.get('municipality'),
-                        farm_type: formData.get('farm_type'),
-                        year: formData.get('year'),
-                        month: formData.get('month'),
-                        crop: formData.get('crop'),
-                        area_planted: formData.get('area_planted'),
-                        area_harvested: formData.get('area_harvested'),
-                        productivity: formData.get('productivity'),
-                    })
+                    body: JSON.stringify(requestPayload)
                 });
                 
                 const result = await response.json();
@@ -234,6 +410,196 @@
                 submitBtn.disabled = false;
                 btnText.textContent = 'Predict Production';
                 spinner.classList.add('hidden');
+            }
+        });
+
+        // Forecast Form Handler
+        document.getElementById('forecastForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const forecastBtn = document.getElementById('forecastBtn');
+            const forecastBtnText = document.getElementById('forecastBtnText');
+            const forecastSpinner = document.getElementById('forecastSpinner');
+            const forecastResults = document.getElementById('forecastResults');
+            const forecastContent = document.getElementById('forecastContent');
+            const forecastError = document.getElementById('forecastError');
+            const forecastErrorMessage = document.getElementById('forecastErrorMessage');
+            
+            // Hide previous results/errors
+            forecastResults.classList.add('hidden');
+            forecastError.classList.add('hidden');
+            
+            // Show loading state
+            forecastBtn.disabled = true;
+            forecastBtnText.textContent = 'Generating Forecast...';
+            forecastSpinner.classList.remove('hidden');
+            
+            try {
+                const formData = new FormData(this);
+                
+                const requestPayload = {
+                    municipality: formData.get('municipality'),
+                    crop: formData.get('crop'),
+                    forecast_years: 2  // Default, Python API will return all available
+                };
+                
+                console.log('Sending forecast request:', requestPayload);
+                
+                const response = await fetch('{{ route('predictions.forecast') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestPayload)
+                });
+                
+                const result = await response.json();
+                
+                console.log('Forecast API Response:', result);
+                
+                if (result.success || response.ok) {
+                    const forecast = result.forecast || result.data || [];
+                    const metadata = result.metadata || {};
+                    const historical = result.historical || {};
+                    const trend = result.trend || {};
+                    
+                    // Display summary card
+                    let html = `
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-lg border-2 border-green-200 mb-6">
+                            <h4 class="text-lg font-bold text-gray-800 mb-2">Forecast Summary</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                <div>
+                                    <p class="text-xs text-gray-600">Municipality</p>
+                                    <p class="text-sm font-semibold text-gray-800">${result.municipality || requestPayload.municipality}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Crop</p>
+                                    <p class="text-sm font-semibold text-gray-800">${result.crop || requestPayload.crop}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Forecast Years</p>
+                                    <p class="text-sm font-semibold text-gray-800">${forecast.length} years</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Trend</p>
+                                    <p class="text-sm font-semibold ${trend.direction === 'increasing' ? 'text-green-600' : trend.direction === 'decreasing' ? 'text-red-600' : 'text-gray-600'}">
+                                        ${trend.direction ? '↑ ' + trend.direction : 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Display forecast data table
+                    html += `
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Predicted Production</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">YoY Growth</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                    `;
+                    
+                    forecast.forEach((item, index) => {
+                        // Calculate growth rate from previous year
+                        let growthRate = null;
+                        let growthClass = 'text-gray-600';
+                        let growthSymbol = '';
+                        
+                        if (index > 0) {
+                            const prevProduction = forecast[index - 1].production;
+                            growthRate = ((item.production - prevProduction) / prevProduction * 100);
+                            growthClass = growthRate >= 0 ? 'text-green-600' : 'text-red-600';
+                            growthSymbol = growthRate >= 0 ? '+' : '';
+                        } else if (historical.last_production) {
+                            // Compare first forecast year with last historical year
+                            growthRate = ((item.production - historical.last_production) / historical.last_production * 100);
+                            growthClass = growthRate >= 0 ? 'text-green-600' : 'text-red-600';
+                            growthSymbol = growthRate >= 0 ? '+' : '';
+                        }
+                        
+                        html += `
+                            <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.year}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">
+                                    ${parseFloat(item.production).toFixed(2)} MT
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${growthClass}">
+                                    ${growthRate !== null ? growthSymbol + growthRate.toFixed(2) + '%' : 'Baseline'}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                                    ${trend.growth_rate_percent ? parseFloat(trend.growth_rate_percent).toFixed(2) + '%/year' : 'N/A'}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    // Add historical and trend statistics
+                    html += `
+                        <div class="mt-6">
+                            <h4 class="text-md font-semibold text-gray-800 mb-3">Historical Context & Trend Analysis</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                ${historical.average ? `
+                                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                        <p class="text-xs text-gray-600 mb-1">Historical Average</p>
+                                        <p class="text-lg font-bold text-blue-700">${parseFloat(historical.average).toFixed(2)} MT</p>
+                                        <p class="text-xs text-gray-500 mt-1">(${historical.years_available || 10} years)</p>
+                                    </div>
+                                ` : ''}
+                                ${historical.last_production ? `
+                                    <div class="bg-purple-50 border border-purple-200 p-4 rounded-lg">
+                                        <p class="text-xs text-gray-600 mb-1">Last Year (${historical.last_year || 2024})</p>
+                                        <p class="text-lg font-bold text-purple-700">${parseFloat(historical.last_production).toFixed(2)} MT</p>
+                                    </div>
+                                ` : ''}
+                                ${trend.growth_rate_percent ? `
+                                    <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                        <p class="text-xs text-gray-600 mb-1">Annual Growth Rate</p>
+                                        <p class="text-lg font-bold text-green-700">${parseFloat(trend.growth_rate_percent).toFixed(2)}%</p>
+                                        <p class="text-xs text-gray-500 mt-1">per year</p>
+                                    </div>
+                                ` : ''}
+                                ${trend.slope ? `
+                                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                        <p class="text-xs text-gray-600 mb-1">Trend Slope</p>
+                                        <p class="text-lg font-bold text-amber-700">${parseFloat(trend.slope).toFixed(2)}</p>
+                                        <p class="text-xs text-gray-500 mt-1">MT/year</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    forecastContent.innerHTML = html;
+                    forecastResults.classList.remove('hidden');
+                    forecastResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    throw new Error(result.error || 'Forecast generation failed');
+                }
+                
+            } catch (error) {
+                console.error('Forecast Error:', error);
+                forecastErrorMessage.textContent = error.message || 'An unexpected error occurred. Please try again.';
+                forecastError.classList.remove('hidden');
+                forecastError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } finally {
+                // Reset button state
+                forecastBtn.disabled = false;
+                forecastBtnText.textContent = 'Generate Forecast';
+                forecastSpinner.classList.add('hidden');
             }
         });
     </script>

@@ -5,13 +5,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CropPredictionController;
 use App\Http\Controllers\CropDataController;
 use App\Http\Controllers\MapController;
+use App\Models\CropProduction;
+use App\Models\Prediction;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    // Fetch statistics from database
+    $totalRecords = CropProduction::count();
+    $municipalitiesCount = CropProduction::distinct('municipality')->count();
+    $cropTypesCount = CropProduction::distinct('crop')->count();
+    $predictionsCount = Prediction::count();
+    
+    return view('dashboard', compact('totalRecords', 'municipalitiesCount', 'cropTypesCount', 'predictionsCount'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -24,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [CropPredictionController::class, 'index'])->name('predictions.index');
         Route::get('/predict', [CropPredictionController::class, 'index'])->name('predictions.predict.form');
         Route::post('/predict', [CropPredictionController::class, 'predict'])->name('predictions.predict');
+        Route::post('/forecast', [CropPredictionController::class, 'forecast'])->name('predictions.forecast');
         Route::post('/batch-predict', [CropPredictionController::class, 'batchPredict'])->name('predictions.batch');
         Route::get('/history', [CropPredictionController::class, 'history'])->name('predictions.history');
         Route::get('/options', [CropPredictionController::class, 'getOptions'])->name('predictions.options');

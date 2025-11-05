@@ -84,22 +84,34 @@ class CropPredictionService
      */
     public function predict(array $data)
     {
+        // Convert month number to month name
+        $monthMap = [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+        ];
+        
+        $monthValue = is_numeric($data['month']) 
+            ? ($monthMap[(int)$data['month']] ?? $data['month'])
+            : $data['month'];
+        
         $requestData = [
             'MUNICIPALITY' => $data['municipality'],
             'FARM_TYPE' => $data['farm_type'],
-            'YEAR' => $data['year'],
-            'MONTH' => $data['month'],
+            'YEAR' => (int)$data['year'], // Ensure it's an integer
+            'MONTH' => $monthValue,
             'CROP' => $data['crop'],
-            'Area_planted_ha' => $data['area_planted'],
-            'Area_harvested_ha' => $data['area_harvested'],
-            'Productivity_mt_ha' => $data['productivity']
+            'Area_planted_ha' => (float)$data['area_planted'],
+            'Area_harvested_ha' => (float)$data['area_harvested'],
+            'Productivity_mt_ha' => (float)$data['productivity']
         ];
         
         try {
             $startTime = microtime(true);
             
             Log::info('ML API Prediction Request', [
-                'input' => $requestData
+                'raw_input' => $data,
+                'formatted_request' => $requestData
             ]);
             
             $response = Http::timeout($this->timeout)->post("{$this->apiUrl}/api/predict", $requestData);
@@ -193,6 +205,78 @@ class CropPredictionService
             throw new Exception('Failed to fetch model info');
         } catch (Exception $e) {
             Log::error('Failed to get model info: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Generate multi-year forecast
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function forecast(array $data)
+    {
+        // Python API only needs CROP and MUNICIPALITY
+        // It returns pre-generated forecasts (doesn't use FARM_TYPE or FORECAST_YEARS)
+        $requestData = [
+            'CROP' => strtoupper($data['crop']),
+            'MUNICIPALITY' => strtoupper($data['municipality'])
+        ];
+        
+        try {
+            $startTime = microtime(true);
+            
+            Log::info('ML API Forecast Request', [
+                'request' => $requestData,
+                'requested_years' => $data['forecast_years'] ?? 'default'
+            ]);
+            
+            $response = Http::timeout($this->timeout)->post("{$this->apiUrl}/api/forecast", $requestData);
+            
+            $responseTime = (microtime(true) - $startTime) * 1000;
+            
+            if ($response->successful()) {
+                $result = $response->json();
+                
+                // Filter forecast data to requested number of years
+                $requestedYears = $data['forecast_years'] ?? 5;
+                if (isset($result['forecast']) && is_array($result['forecast'])) {
+                    $result['forecast'] = array_slice($result['forecast'], 0, $requestedYears);
+                }
+                
+                // Add metadata
+                $result['metadata'] = array_merge($result['metadata'] ?? [], [
+                    'requested_years' => $requestedYears,
+                    'farm_type' => $data['farm_type'] ?? 'All',
+                    'api_response_time_ms' => round($responseTime)
+                ]);
+                
+                Log::info('ML API Forecast Success', [
+                    'response_time_ms' => round($responseTime, 2),
+                    'forecast_count' => count($result['forecast'] ?? []),
+                    'years_filtered' => $requestedYears
+                ]);
+                
+                return $result;
+            }
+            
+            $error = $response->json()['error'] ?? 'Forecast generation failed';
+            
+            Log::error('ML API Forecast Failed', [
+                'status' => $response->status(),
+                'error' => $error,
+                'response_time_ms' => round($responseTime, 2)
+            ]);
+            
+            throw new Exception($error);
+            
+        } catch (Exception $e) {
+            Log::error('Forecast Exception', [
+                'error' => $e->getMessage(),
+                'input' => $requestData,
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
     }

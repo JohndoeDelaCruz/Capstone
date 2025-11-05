@@ -39,7 +39,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-600">Crop Records</p>
-                            <p class="text-xl font-bold text-gray-900">30,968</p>
+                            <p class="text-xl font-bold text-gray-900">{{ number_format($totalRecords) }}</p>
                             <p class="text-xs text-gray-500">Historical data points</p>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-600">Municipalities</p>
-                            <p class="text-xl font-bold text-gray-900">14</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $municipalitiesCount }}</p>
                             <p class="text-xs text-gray-500">Covered areas</p>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-600">Crop Types</p>
-                            <p class="text-xl font-bold text-gray-900">10</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $cropTypesCount }}</p>
                             <p class="text-xs text-gray-500">Different varieties</p>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-600">Predictions Made</p>
-                            <p class="text-xl font-bold text-gray-900">0</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $predictionsCount }}</p>
                             <p class="text-xs text-purple-600 hover:underline cursor-pointer">View history →</p>
                         </div>
                     </div>
