@@ -33,15 +33,14 @@ class CropPredictionController extends Controller
      */
     public function predict(Request $request)
     {
+        // NEW MODEL: Only 6 features required (no area_harvested or productivity)
         $validator = Validator::make($request->all(), [
             'municipality' => 'required|string',
             'farm_type' => 'required|string',
             'year' => 'required|integer|min:2020|max:2030',
             'month' => 'required|integer|min:1|max:12',
             'crop' => 'required|string',
-            'area_planted' => 'required|numeric|min:0',
-            'area_harvested' => 'required|numeric|min:0',
-            'productivity' => 'required|numeric|min:0'
+            'area_planted' => 'required|numeric|min:0'
         ]);
         
         if ($validator->fails()) {
@@ -58,7 +57,7 @@ class CropPredictionController extends Controller
             // Extract prediction data
             $prediction = $result['prediction'] ?? $result;
             
-            // Save prediction to database
+            // Save prediction to database (new model - no area_harvested or productivity)
             $predictionRecord = \App\Models\Prediction::create([
                 'user_id' => auth()->id(),
                 'municipality' => $request->municipality,
@@ -67,11 +66,11 @@ class CropPredictionController extends Controller
                 'month' => $request->month,
                 'crop' => $request->crop,
                 'area_planted_ha' => $request->area_planted,
-                'area_harvested_ha' => $request->area_harvested,
-                'productivity_mt_ha' => $request->productivity,
-                'predicted_production_mt' => $prediction['production_mt'] ?? $prediction['Production_mt'] ?? 0,
-                'expected_from_productivity' => $prediction['expected_from_productivity'] ?? $prediction['Expected_from_Productivity'] ?? 0,
-                'difference' => $prediction['difference'] ?? $prediction['Difference'] ?? 0,
+                'area_harvested_ha' => null, // New model doesn't use this
+                'productivity_mt_ha' => null, // New model doesn't use this
+                'predicted_production_mt' => $prediction['production_mt'] ?? $prediction['Production_mt'] ?? $prediction['predicted_production'] ?? 0,
+                'expected_from_productivity' => null, // Not applicable for new model
+                'difference' => null, // Not applicable for new model
                 'confidence_score' => $prediction['confidence_score'] ?? $prediction['Confidence_Score'] ?? 0,
                 'api_response_time_ms' => $result['api_response_time_ms'] ?? null,
                 'status' => 'success'
@@ -92,11 +91,11 @@ class CropPredictionController extends Controller
                     'month' => $request->month,
                     'crop' => $request->crop,
                     'area_planted_ha' => $request->area_planted,
-                    'area_harvested_ha' => $request->area_harvested,
-                    'productivity_mt_ha' => $request->productivity,
+                    'area_harvested_ha' => null,
+                    'productivity_mt_ha' => null,
                     'predicted_production_mt' => 0,
-                    'expected_from_productivity' => 0,
-                    'difference' => 0,
+                    'expected_from_productivity' => null,
+                    'difference' => null,
                     'confidence_score' => 0,
                     'status' => 'failed',
                     'error_message' => $e->getMessage()

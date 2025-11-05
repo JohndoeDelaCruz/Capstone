@@ -95,15 +95,17 @@ class CropPredictionService
             ? ($monthMap[(int)$data['month']] ?? $data['month'])
             : $data['month'];
         
+        // NEW MODEL (68.17% accuracy): Only 6 features needed
+        // Municipality name normalization: "LA TRINIDAD" -> "LATRINIDAD"
+        $normalizedMunicipality = strtoupper(str_replace(' ', '', $data['municipality']));
+        
         $requestData = [
-            'MUNICIPALITY' => $data['municipality'],
-            'FARM_TYPE' => $data['farm_type'],
-            'YEAR' => (int)$data['year'], // Ensure it's an integer
+            'MUNICIPALITY' => $normalizedMunicipality,
+            'FARM_TYPE' => strtoupper($data['farm_type']),
+            'YEAR' => (int)$data['year'],
             'MONTH' => $monthValue,
-            'CROP' => $data['crop'],
-            'Area_planted_ha' => (float)$data['area_planted'],
-            'Area_harvested_ha' => (float)$data['area_harvested'],
-            'Productivity_mt_ha' => (float)$data['productivity']
+            'CROP' => strtoupper($data['crop']),
+            'Area_planted_ha' => (float)$data['area_planted']
         ];
         
         try {
@@ -120,6 +122,11 @@ class CropPredictionService
             
             if ($response->successful()) {
                 $result = $response->json();
+                
+                // Normalize new API format: production_mt -> predicted_production
+                if (isset($result['prediction']['production_mt']) && !isset($result['prediction']['predicted_production'])) {
+                    $result['prediction']['predicted_production'] = $result['prediction']['production_mt'];
+                }
                 
                 Log::info('ML API Prediction Success', [
                     'response_time_ms' => round($responseTime, 2),

@@ -17,16 +17,16 @@
                             <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                             </svg>
-                            Single Year Prediction
-                            <span class="block text-xs text-gray-500 mt-1">For historical or current year (2015-2024)</span>
+                            Historical Analysis
+                            <span class="block text-xs text-gray-500 mt-1">Validate model accuracy (2015-2024)</span>
                         </button>
                         <button type="button" onclick="switchTab('forecast')" id="tab-forecast"
                             class="tab-button w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
                             <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                             </svg>
-                            Multi-Year Forecast
-                            <span class="block text-xs text-gray-500 mt-1">For future years (2025-2030+)</span>
+                            Future Production Forecast
+                            <span class="block text-xs text-gray-500 mt-1">See year-to-year trends (2025-2030+)</span>
                         </button>
                     </nav>
                 </div>
@@ -66,10 +66,16 @@
 
                             <!-- Year -->
                             <div>
-                                <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                                <input type="number" id="year" name="year" min="2020" max="2030" required
-                                    value="{{ date('Y') }}"
+                                <label for="year" class="block text-sm font-medium text-gray-700">
+                                    Year
+                                    <span class="text-xs text-gray-500">(2015-2024 for historical analysis)</span>
+                                </label>
+                                <input type="number" id="year" name="year" min="2015" max="2024" required
+                                    value="2024"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <p class="mt-1 text-xs text-blue-600">
+                                    💡 For years 2025+, use the <strong>Multi-Year Forecast</strong> tab
+                                </p>
                             </div>
 
                             <!-- Month -->
@@ -98,23 +104,33 @@
 
                             <!-- Area Planted -->
                             <div>
-                                <label for="area_planted" class="block text-sm font-medium text-gray-700">Area Planted (hectares)</label>
+                                <label for="area_planted" class="block text-sm font-medium text-gray-700">
+                                    Area Planted (hectares)
+                                    <span class="text-xs text-gray-500 ml-1">How much land will you plant?</span>
+                                </label>
                                 <input type="number" id="area_planted" name="area_planted" step="0.01" min="0" required
+                                    placeholder="e.g., 100.5"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <p class="mt-1 text-xs text-gray-500">💡 The model predicts production based on this area</p>
                             </div>
+                        </div>
 
-                            <!-- Area Harvested -->
-                            <div>
-                                <label for="area_harvested" class="block text-sm font-medium text-gray-700">Area Harvested (hectares)</label>
-                                <input type="number" id="area_harvested" name="area_harvested" step="0.01" min="0" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            </div>
-
-                            <!-- Productivity -->
-                            <div>
-                                <label for="productivity" class="block text-sm font-medium text-gray-700">Productivity (MT/ha)</label>
-                                <input type="number" id="productivity" name="productivity" step="0.01" min="0" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <!-- Info Box about historical analysis -->
+                        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-blue-900">📊 Purpose: Historical Analysis & Model Validation</h4>
+                                    <p class="mt-1 text-xs text-blue-800">
+                                        This tool validates our AI model's accuracy using <strong>historical data (2015-2024)</strong>.<br>
+                                        Compare predictions against actual production to see how well the model performs.<br><br>
+                                        <strong>Model trained on:</strong> 10 years of Benguet crop data<br>
+                                        <strong>Accuracy:</strong> 68.17% (crop-sensitive predictions)<br>
+                                        <strong>For future years:</strong> Use the <a href="#" onclick="switchTab('forecast'); return false;" class="underline font-semibold">Future Production Forecast</a> tab 🔮
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -173,7 +189,8 @@
                                 <div class="ml-3">
                                     <p class="text-sm text-blue-700">
                                         <strong>Multi-Year Forecast</strong> uses time-series analysis to predict production trends for future years (2025-2030). 
-                                        This is more accurate for future predictions than single-year predictions.
+                                        This is more accurate for future predictions than single-year predictions.<br>
+                                        <span class="text-xs">📊 Shows <strong>combined production</strong> for both IRRIGATED and RAINFED farms in the selected municipality.</span>
                                     </p>
                                 </div>
                             </div>
@@ -212,9 +229,9 @@
                                     <label for="forecast_years" class="block text-sm font-medium text-gray-700">Forecast Period</label>
                                     <select id="forecast_years" name="forecast_years" required disabled
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100">
-                                        <option value="2" selected>Available Years (Auto)</option>
+                                        <option value="6" selected>6 Years (2025-2030)</option>
                                     </select>
-                                    <p class="mt-1 text-xs text-gray-500">Based on pre-generated forecast data</p>
+                                    <p class="mt-1 text-xs text-gray-500">Shows year-over-year production trends</p>
                                 </div>
                             </div>
 
@@ -304,6 +321,43 @@
             }
         }
 
+        // Auto-detect future years and suggest forecast tab
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearInput = document.getElementById('year');
+            const warningDiv = document.createElement('div');
+            warningDiv.id = 'year-warning';
+            warningDiv.className = 'hidden mt-2 p-3 bg-yellow-50 border border-yellow-300 rounded-lg';
+            warningDiv.innerHTML = `
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-yellow-800">Future Year Detected!</p>
+                        <p class="text-xs text-yellow-700 mt-1">
+                            For years 2025 and beyond, please use the <strong>Future Production Forecast</strong> tab to see year-to-year trends.
+                        </p>
+                        <button type="button" onclick="switchTab('forecast')" 
+                            class="mt-2 text-xs font-medium text-yellow-800 underline hover:text-yellow-900">
+                            → Switch to Forecast Tab
+                        </button>
+                    </div>
+                </div>
+            `;
+            yearInput.parentNode.appendChild(warningDiv);
+
+            yearInput.addEventListener('input', function() {
+                const year = parseInt(this.value);
+                if (year >= 2025) {
+                    warningDiv.classList.remove('hidden');
+                    this.classList.add('border-yellow-400');
+                } else {
+                    warningDiv.classList.add('hidden');
+                    this.classList.remove('border-yellow-400');
+                }
+            });
+        });
+
         // Prediction Form Handler
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -328,18 +382,17 @@
             try {
                 const formData = new FormData(this);
                 
+                // NEW MODEL: Only 6 features needed (no area_harvested or productivity)
                 const requestPayload = {
                     municipality: formData.get('municipality'),
                     farm_type: formData.get('farm_type'),
                     year: parseInt(formData.get('year')),
                     month: parseInt(formData.get('month')),
                     crop: formData.get('crop'),
-                    area_planted: parseFloat(formData.get('area_planted')),
-                    area_harvested: parseFloat(formData.get('area_harvested')),
-                    productivity: parseFloat(formData.get('productivity')),
+                    area_planted: parseFloat(formData.get('area_planted'))
                 };
                 
-                console.log('Sending request:', requestPayload); // Debug log
+                console.log('Sending request (6 features):', requestPayload); // Debug log
                 
                 const response = await fetch('{{ route('predictions.predict') }}', {
                     method: 'POST',
@@ -360,8 +413,6 @@
                     const prediction = result.prediction || result;
                     
                     const productionMt = prediction.production_mt || prediction.Production_mt || 0;
-                    const expectedFromProductivity = prediction.expected_from_productivity || prediction.Expected_from_Productivity || 0;
-                    const difference = prediction.difference || prediction.Difference || 0;
                     const confidenceScore = prediction.confidence_score || prediction.Confidence_Score || 0;
                     
                     resultsContent.innerHTML = `
@@ -372,24 +423,29 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
-                                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Expected from Productivity</p>
-                                <p class="text-2xl font-semibold text-gray-800">${parseFloat(expectedFromProductivity).toFixed(2)} <span class="text-sm text-gray-600">MT</span></p>
-                            </div>
-                            
-                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
-                                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Difference</p>
-                                <p class="text-2xl font-semibold ${parseFloat(difference) >= 0 ? 'text-green-600' : 'text-red-600'}">
-                                    ${parseFloat(difference) >= 0 ? '+' : ''}${parseFloat(difference).toFixed(2)} <span class="text-sm">MT</span>
-                                </p>
-                            </div>
-                        </div>
-                        
                         <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-700">Model Confidence Score</span>
-                                <span class="text-lg font-bold text-blue-700">${parseFloat(confidenceScore).toFixed(4)}</span>
+                                <span class="text-lg font-bold text-blue-700">${parseFloat(confidenceScore * 100).toFixed(2)}%</span>
+                            </div>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${parseFloat(confidenceScore * 100).toFixed(0)}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 border border-green-200 p-3 rounded-lg">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <p class="text-xs font-semibold text-green-900">Crop-Sensitive AI Model</p>
+                                    <p class="text-xs text-green-800 mt-1">
+                                        This prediction is based on historical patterns of <strong>${requestPayload.crop}</strong> in 
+                                        <strong>${requestPayload.municipality}</strong> with <strong>${requestPayload.farm_type}</strong> farming.
+                                        Different crops in different locations will produce different results! 🌾
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -440,7 +496,7 @@
                 const requestPayload = {
                     municipality: formData.get('municipality'),
                     crop: formData.get('crop'),
-                    forecast_years: 2  // Default, Python API will return all available
+                    forecast_years: 6  // Request 6 years (2025-2030)
                 };
                 
                 console.log('Sending forecast request:', requestPayload);

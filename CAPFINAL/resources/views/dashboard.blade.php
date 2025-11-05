@@ -26,6 +26,54 @@
                 </div>
             </div>
 
+            <!-- Top 5 Crops Chart Section -->
+            <div class="mb-6">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2 md:mb-0">Top 5 Crops by Production</h3>
+                        <div class="flex items-center space-x-2">
+                            <label for="municipalitySelect" class="text-sm text-gray-600">Municipality:</label>
+                            <select id="municipalitySelect" class="border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 text-sm">
+                                <option value="LATRINIDAD">La Trinidad</option>
+                                <option value="BAGUIO">Baguio City</option>
+                                <option value="ITOGON">Itogon</option>
+                                <option value="SABLAN">Sablan</option>
+                                <option value="TUBA">Tuba</option>
+                                <option value="TUBLAY">Tublay</option>
+                                <option value="ATOK">Atok</option>
+                                <option value="BAKUN">Bakun</option>
+                                <option value="BOKOD">Bokod</option>
+                                <option value="BUGUIAS">Buguias</option>
+                                <option value="KABAYAN">Kabayan</option>
+                                <option value="KAPANGAN">Kapangan</option>
+                                <option value="KIBUNGAN">Kibungan</option>
+                                <option value="MANKAYAN">Mankayan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="chartLoading" class="text-center py-8">
+                        <svg class="inline-block animate-spin h-8 w-8 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-gray-600 mt-2 text-sm">Loading chart data...</p>
+                    </div>
+                    <div id="chartContainer" class="hidden">
+                        <canvas id="topCropsChart" class="w-full" style="max-height: 400px;"></canvas>
+                        <div class="mt-4 text-xs text-gray-500 border-t border-gray-200 pt-3">
+                            <p><strong>Historical (2015-2024):</strong> Average annual production from actual data</p>
+                            <p><strong>Predicted:</strong> Current year forecast using ML models. <a href="{{ route('predictions.predict.form') }}" class="text-blue-600 hover:underline">View multi-year trends →</a></p>
+                        </div>
+                    </div>
+                    <div id="chartError" class="hidden text-center py-8 text-red-600">
+                        <svg class="inline-block h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="mt-2 text-sm">Failed to load chart data. Please try again.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Statistics Grid -->
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -182,4 +230,152 @@
 
         </div>
     </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        let topCropsChart = null;
+
+        // Load chart data for selected municipality
+        async function loadTopCropsChart(municipality) {
+            const loadingEl = document.getElementById('chartLoading');
+            const containerEl = document.getElementById('chartContainer');
+            const errorEl = document.getElementById('chartError');
+
+            // Show loading state
+            loadingEl.classList.remove('hidden');
+            containerEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/top-crops', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ MUNICIPALITY: municipality })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error('API returned error');
+                }
+
+                // Prepare chart data
+                const crops = data.historical_top5.crops.map(crop => crop.crop);
+                // Convert historical monthly average to yearly average for fair comparison
+                const historicalData = data.historical_top5.crops.map(crop => crop.yearly_data.average);
+                
+                // Get only the current year's prediction (or next year if past December)
+                const currentYear = new Date().getFullYear();
+                const predictedData = data.predicted_top5.crops.map(crop => {
+                    // Find the forecast for current year
+                    const currentYearForecast = crop.forecasts.find(f => f.year === currentYear);
+                    return currentYearForecast ? currentYearForecast.production : 0;
+                });
+
+                // Destroy existing chart if any
+                if (topCropsChart) {
+                    topCropsChart.destroy();
+                }
+
+                // Create new chart
+                const ctx = document.getElementById('topCropsChart').getContext('2d');
+                topCropsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: crops,
+                        datasets: [
+                            {
+                                label: 'Historical Avg (2015-2024)',
+                                data: historicalData,
+                                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                                borderColor: 'rgba(34, 197, 94, 1)',
+                                borderWidth: 2
+                            },
+                            {
+                                label: `Predicted (${currentYear})`,
+                                data: predictedData,
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Top 5 Crops in ${municipality.charAt(0) + municipality.slice(1).toLowerCase().replace('trinidad', ' Trinidad')}`,
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' MT';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Average Production (MT)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(0);
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Crop Type'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Hide loading, show chart
+                loadingEl.classList.add('hidden');
+                containerEl.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading chart:', error);
+                loadingEl.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // Initialize chart on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const municipalitySelect = document.getElementById('municipalitySelect');
+            
+            // Load initial chart
+            loadTopCropsChart(municipalitySelect.value);
+
+            // Update chart when municipality changes
+            municipalitySelect.addEventListener('change', function() {
+                loadTopCropsChart(this.value);
+            });
+        });
+    </script>
 </x-app-layout>
