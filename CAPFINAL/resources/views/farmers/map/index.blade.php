@@ -1,44 +1,44 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-lg lg:text-xl text-gray-800 leading-tight">
             {{ __('Interactive Crop Production Map') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 lg:py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
             <!-- Control Panel -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Map Controls</h3>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-4 lg:mb-6">
+                <div class="p-4 lg:p-6">
+                    <h3 class="text-base lg:text-lg font-semibold text-gray-800 mb-3 lg:mb-4">Map Controls</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                         <!-- Crop Filter -->
                         <div>
-                            <label for="crop-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="crop-filter" class="block text-xs lg:text-sm font-medium text-gray-700 mb-1 lg:mb-2">
                                 Crop Type
                             </label>
-                            <select id="crop-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            <select id="crop-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
                                 <option value="">Loading...</option>
                             </select>
                         </div>
 
                         <!-- Year Filter -->
                         <div>
-                            <label for="year-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="year-filter" class="block text-xs lg:text-sm font-medium text-gray-700 mb-1 lg:mb-2">
                                 Year
                             </label>
-                            <select id="year-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            <select id="year-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
                                 <option value="">Loading...</option>
                             </select>
                         </div>
 
                         <!-- View Type Filter -->
                         <div>
-                            <label for="view-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="view-filter" class="block text-xs lg:text-sm font-medium text-gray-700 mb-1 lg:mb-2">
                                 View Type
                             </label>
-                            <select id="view-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            <select id="view-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
                                 <option value="production">Total Production (kg)</option>
                                 <option value="area_harvested">Area Harvested (ha)</option>
                                 <option value="productivity">Productivity (kg/ha)</option>
@@ -47,10 +47,10 @@
 
                         <!-- Farm Type Filter -->
                         <div>
-                            <label for="farm-type-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="farm-type-filter" class="block text-xs lg:text-sm font-medium text-gray-700 mb-1 lg:mb-2">
                                 Farm Type
                             </label>
-                            <select id="farm-type-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            <select id="farm-type-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
                                 <option value="">All Farm Types</option>
                                 <option value="Irrigated">Irrigated</option>
                                 <option value="Rainfed">Rainfed</option>
@@ -73,31 +73,31 @@
 
             <!-- Map Container -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 relative">
-                    <div id="map" style="height: 600px; width: 100%;" class="rounded-lg shadow-inner"></div>
+                <div class="p-3 lg:p-6 relative">
+                    <div id="map" style="height: 400px; width: 100%;" class="rounded-lg shadow-inner sm:h-[500px] lg:h-[600px]"></div>
                     
                     <!-- Legend - Positioned on the left side of map -->
-                    <div id="legend" class="absolute bottom-8 left-8 bg-white p-4 rounded-lg shadow-lg border-2 border-gray-200 z-[1000]" style="max-width: 280px;">
-                        <h4 class="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">Production Legend</h4>
+                    <div id="legend" class="absolute bottom-4 left-4 lg:bottom-8 lg:left-8 bg-white p-3 lg:p-4 rounded-lg shadow-lg border-2 border-gray-200 z-[1000] max-w-[200px] sm:max-w-[240px] lg:max-w-[280px]">
+                        <h4 class="font-bold text-gray-800 mb-2 lg:mb-3 text-xs lg:text-sm uppercase tracking-wide">Production Legend</h4>
                         <div id="legend-content">
                             <span class="text-xs text-gray-600">Select filters to view data</span>
                         </div>
                     </div>
 
                     <!-- Municipality Details Panel - Slides from right -->
-                    <div id="details-panel" class="fixed top-0 right-0 h-full bg-white shadow-2xl z-[2000] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto" style="width: 450px;">
-                        <div class="p-6">
+                    <div id="details-panel" class="fixed top-0 right-0 h-full bg-white shadow-2xl z-[2000] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto w-full sm:w-[400px] lg:w-[450px]">
+                        <div class="p-4 lg:p-6">
                             <!-- Close Button -->
-                            <button onclick="closeDetailsPanel()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button onclick="closeDetailsPanel()" class="absolute top-3 right-3 lg:top-4 lg:right-4 text-gray-500 hover:text-gray-700">
+                                <svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                             </button>
 
                             <!-- Panel Header -->
-                            <div class="mb-6">
-                                <h2 id="panel-municipality-name" class="text-2xl font-bold text-gray-800 mb-2">Municipality Name</h2>
-                                <p class="text-sm text-gray-600">Click on municipality data below</p>
+                            <div class="mb-4 lg:mb-6 pr-8">
+                                <h2 id="panel-municipality-name" class="text-xl lg:text-2xl font-bold text-gray-800 mb-2">Municipality Name</h2>
+                                <p class="text-xs lg:text-sm text-gray-600">Click on municipality data below</p>
                             </div>
 
                             <!-- Loading Indicator -->
@@ -161,25 +161,25 @@
             </div>
 
             <!-- Statistics Panel -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Summary Statistics</h3>
-                    <div id="stats-content" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-4 lg:mt-6">
+                <div class="p-4 lg:p-6">
+                    <h3 class="text-base lg:text-lg font-semibold text-gray-800 mb-3 lg:mb-4">Summary Statistics</h3>
+                    <div id="stats-content" class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
                         <div class="text-center">
-                            <p class="text-sm text-gray-600">Total Production</p>
-                            <p id="stat-total" class="text-2xl font-bold text-green-600">-</p>
+                            <p class="text-xs lg:text-sm text-gray-600">Total Production</p>
+                            <p id="stat-total" class="text-lg lg:text-2xl font-bold text-green-600">-</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-sm text-gray-600">Average</p>
-                            <p id="stat-avg" class="text-2xl font-bold text-green-600">-</p>
+                            <p class="text-xs lg:text-sm text-gray-600">Average</p>
+                            <p id="stat-avg" class="text-lg lg:text-2xl font-bold text-green-600">-</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-sm text-gray-600">Highest</p>
-                            <p id="stat-max" class="text-2xl font-bold text-green-600">-</p>
+                            <p class="text-xs lg:text-sm text-gray-600">Highest</p>
+                            <p id="stat-max" class="text-lg lg:text-2xl font-bold text-green-600">-</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-sm text-gray-600">Lowest</p>
-                            <p id="stat-min" class="text-2xl font-bold text-green-600">-</p>
+                            <p class="text-xs lg:text-sm text-gray-600">Lowest</p>
+                            <p id="stat-min" class="text-lg lg:text-2xl font-bold text-green-600">-</p>
                         </div>
                     </div>
                 </div>

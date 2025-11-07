@@ -19,7 +19,7 @@
             @include('layouts.navigation')
 
             <!-- Page Content -->
-            <main class="flex-1 ml-64 overflow-y-auto">
+            <main class="flex-1 lg:ml-64 overflow-y-auto">
                 {{ $slot }}
             </main>
         </div>
