@@ -1,33 +1,31 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-lg lg:text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Crop Production Prediction & Forecasting') }}
         </h2>
     </x-slot>
 
-    <div class="py-4 lg:py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tab Navigation -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-4 lg:mb-6">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="border-b border-gray-200">
                     <nav class="flex -mb-px" aria-label="Tabs">
                         <button type="button" onclick="switchTab('prediction')" id="tab-prediction"
-                            class="tab-button active w-1/2 py-3 lg:py-4 px-1 text-center border-b-2 font-medium text-xs lg:text-sm">
-                            <svg class="inline-block w-4 h-4 lg:w-5 lg:h-5 mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="tab-button active w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                            <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                             </svg>
-                            <span class="hidden sm:inline">Historical Analysis</span>
-                            <span class="sm:hidden">Historical</span>
+                            Historical Analysis
                             <span class="block text-xs text-gray-500 mt-1">Validate model accuracy (2015-2024)</span>
                         </button>
                         <button type="button" onclick="switchTab('forecast')" id="tab-forecast"
-                            class="tab-button w-1/2 py-3 lg:py-4 px-1 text-center border-b-2 font-medium text-xs lg:text-sm">
-                            <svg class="inline-block w-4 h-4 lg:w-5 lg:h-5 mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="tab-button w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                            <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                             </svg>
-                            <span class="hidden sm:inline">Future Production Forecast</span>
-                            <span class="sm:hidden">Forecast</span>
+                            Future Production Forecast
                             <span class="block text-xs text-gray-500 mt-1">See year-to-year trends (2025-2030+)</span>
                         </button>
                     </nav>
@@ -37,16 +35,16 @@
             <!-- Prediction Tab Content -->
             <div id="prediction-content" class="tab-content">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-4 lg:p-6 text-gray-900">
+                    <div class="p-6 text-gray-900">
                         <form id="predictionForm">
                         @csrf
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Municipality -->
                             <div>
-                                <label for="municipality" class="block text-xs lg:text-sm font-medium text-gray-700">Municipality</label>
+                                <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality</label>
                                 <select id="municipality" name="municipality" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Select Municipality</option>
                                     @foreach($options['municipalities'] ?? [] as $municipality)
                                         <option value="{{ $municipality }}">{{ $municipality }}</option>
@@ -56,9 +54,9 @@
 
                             <!-- Farm Type -->
                             <div>
-                                <label for="farm_type" class="block text-xs lg:text-sm font-medium text-gray-700">Farm Type</label>
+                                <label for="farm_type" class="block text-sm font-medium text-gray-700">Farm Type</label>
                                 <select id="farm_type" name="farm_type" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Select Farm Type</option>
                                     @foreach($options['farm_types'] ?? [] as $farm_type)
                                         <option value="{{ $farm_type }}">{{ $farm_type }}</option>
@@ -68,13 +66,13 @@
 
                             <!-- Year -->
                             <div>
-                                <label for="year" class="block text-xs lg:text-sm font-medium text-gray-700">
+                                <label for="year" class="block text-sm font-medium text-gray-700">
                                     Year
                                     <span class="text-xs text-gray-500">(2015-2024 for historical analysis)</span>
                                 </label>
                                 <input type="number" id="year" name="year" min="2015" max="2024" required
                                     value="2024"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <p class="mt-1 text-xs text-blue-600">
                                     💡 For years 2025+, use the <strong>Multi-Year Forecast</strong> tab
                                 </p>
@@ -82,9 +80,9 @@
 
                             <!-- Month -->
                             <div>
-                                <label for="month" class="block text-xs lg:text-sm font-medium text-gray-700">Month</label>
+                                <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
                                 <select id="month" name="month" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Select Month</option>
                                     @for($i = 1; $i <= 12; $i++)
                                         <option value="{{ $i }}">{{ date('F', mktime(0, 0, 0, $i, 1)) }}</option>
@@ -94,9 +92,9 @@
 
                             <!-- Crop -->
                             <div>
-                                <label for="crop" class="block text-xs lg:text-sm font-medium text-gray-700">Crop</label>
+                                <label for="crop" class="block text-sm font-medium text-gray-700">Crop</label>
                                 <select id="crop" name="crop" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">Select Crop</option>
                                     @foreach($options['crops'] ?? [] as $crop)
                                         <option value="{{ $crop }}">{{ $crop }}</option>
@@ -106,13 +104,13 @@
 
                             <!-- Area Planted -->
                             <div>
-                                <label for="area_planted" class="block text-xs lg:text-sm font-medium text-gray-700">
+                                <label for="area_planted" class="block text-sm font-medium text-gray-700">
                                     Area Planted (hectares)
                                     <span class="text-xs text-gray-500 ml-1">How much land will you plant?</span>
                                 </label>
                                 <input type="number" id="area_planted" name="area_planted" step="0.01" min="0" required
                                     placeholder="e.g., 100.5"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm lg:text-base">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <p class="mt-1 text-xs text-gray-500">💡 The model predicts production based on this area</p>
                             </div>
                         </div>
@@ -136,9 +134,9 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 lg:mt-6">
+                        <div class="mt-6">
                             <button type="submit" id="submitBtn"
-                                class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 py-2 lg:py-2.5 px-4 lg:px-6 text-sm lg:text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
+                                class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
                                 <span id="btnText">Predict Production</span>
                                 <svg id="spinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -179,7 +177,7 @@
             <!-- Forecast Tab Content -->
             <div id="forecast-content" class="tab-content hidden">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-4 lg:p-6 text-gray-900">
+                    <div class="p-6 text-gray-900">
                         <!-- Info Banner -->
                         <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                             <div class="flex">
@@ -201,12 +199,12 @@
                         <form id="forecastForm">
                             @csrf
                             
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <!-- Municipality -->
                                 <div>
-                                    <label for="forecast_municipality" class="block text-xs lg:text-sm font-medium text-gray-700">Municipality</label>
+                                    <label for="forecast_municipality" class="block text-sm font-medium text-gray-700">Municipality</label>
                                     <select id="forecast_municipality" name="municipality" required
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
                                         <option value="">Select Municipality</option>
                                         @foreach($options['municipalities'] ?? [] as $municipality)
                                             <option value="{{ $municipality }}">{{ $municipality }}</option>
@@ -216,9 +214,9 @@
 
                                 <!-- Crop -->
                                 <div>
-                                    <label for="forecast_crop" class="block text-xs lg:text-sm font-medium text-gray-700">Crop</label>
+                                    <label for="forecast_crop" class="block text-sm font-medium text-gray-700">Crop</label>
                                     <select id="forecast_crop" name="crop" required
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm lg:text-base">
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
                                         <option value="">Select Crop</option>
                                         @foreach($options['crops'] ?? [] as $crop)
                                             <option value="{{ $crop }}">{{ $crop }}</option>
@@ -228,18 +226,18 @@
 
                                 <!-- Forecast Years (Info only - Python API returns all available) -->
                                 <div>
-                                    <label for="forecast_years" class="block text-xs lg:text-sm font-medium text-gray-700">Forecast Period</label>
+                                    <label for="forecast_years" class="block text-sm font-medium text-gray-700">Forecast Period</label>
                                     <select id="forecast_years" name="forecast_years" required disabled
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100 text-sm lg:text-base">
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 bg-gray-100">
                                         <option value="6" selected>6 Years (2025-2030)</option>
                                     </select>
                                     <p class="mt-1 text-xs text-gray-500">Shows year-over-year production trends</p>
                                 </div>
                             </div>
 
-                            <div class="mt-4 lg:mt-6">
+                            <div class="mt-6">
                                 <button type="submit" id="forecastBtn"
-                                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 py-2 lg:py-2.5 px-4 lg:px-6 text-sm lg:text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50">
+                                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50">
                                     <span id="forecastBtnText">Generate Forecast</span>
                                     <svg id="forecastSpinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -252,34 +250,6 @@
                         <!-- Forecast Results Section -->
                         <div id="forecastResults" class="mt-8 hidden">
                             <h3 class="text-lg font-semibold mb-4 text-gray-900">Forecast Results</h3>
-                            
-                            <!-- Charts Comparison Section -->
-                            <div id="chartsSection" class="mb-6">
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                                    <!-- Historical Chart (2015-2024) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h4 class="text-sm lg:text-base font-semibold text-gray-800 mb-3 text-center">
-                                            📊 Historical Production (2015-2024)
-                                        </h4>
-                                        <div class="relative" style="height: 300px;">
-                                            <canvas id="historicalChart"></canvas>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-2 text-center">Actual production data from past years</p>
-                                    </div>
-                                    
-                                    <!-- Forecast Chart (2025-2030+) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h4 class="text-sm lg:text-base font-semibold text-gray-800 mb-3 text-center">
-                                            🔮 Future Forecast (2025-2030+)
-                                        </h4>
-                                        <div class="relative" style="height: 300px;">
-                                            <canvas id="forecastChart"></canvas>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-2 text-center">Predicted production using ML models</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div id="forecastContent" class="space-y-4">
                                 <!-- Forecast results will be displayed here -->
                             </div>
@@ -307,9 +277,6 @@
         </div>
     </div>
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
     <style>
         .tab-button {
             border-color: transparent;
@@ -334,195 +301,6 @@
     </style>
 
     <script>
-        // Global variables for charts
-        let historicalChartInstance = null;
-        let forecastChartInstance = null;
-
-        // Function to create comparison charts
-        function createComparisonCharts(historicalData, forecastData) {
-            console.log('createComparisonCharts called!');
-            console.log('Historical data:', historicalData);
-            console.log('Forecast data:', forecastData);
-            
-            // Destroy existing charts if they exist
-            if (historicalChartInstance) {
-                historicalChartInstance.destroy();
-            }
-            if (forecastChartInstance) {
-                forecastChartInstance.destroy();
-            }
-
-            // Check if mobile device
-            const isMobile = window.innerWidth < 768;
-
-            // Historical Chart (2015-2024)
-            const historicalCtx = document.getElementById('historicalChart').getContext('2d');
-            console.log('Creating historical chart...');
-            
-            historicalChartInstance = new Chart(historicalCtx, {
-                type: 'line',
-                data: {
-                    labels: historicalData.years,
-                    datasets: [{
-                        label: 'Historical Production',
-                        data: historicalData.production,
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: isMobile ? 3 : 4,
-                        pointHoverRadius: isMobile ? 5 : 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' MT';
-                                }
-                            },
-                            titleFont: {
-                                size: isMobile ? 10 : 12
-                            },
-                            bodyFont: {
-                                size: isMobile ? 9 : 11
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: !isMobile,
-                                text: 'Production (MT)',
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    size: isMobile ? 9 : 11
-                                }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: !isMobile,
-                                text: 'Year',
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    size: isMobile ? 9 : 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Forecast Chart (2025-2030+)
-            const forecastCtx = document.getElementById('forecastChart').getContext('2d');
-            console.log('Creating forecast chart...');
-            
-            forecastChartInstance = new Chart(forecastCtx, {
-                type: 'line',
-                data: {
-                    labels: forecastData.years,
-                    datasets: [{
-                        label: 'Forecast Production',
-                        data: forecastData.production,
-                        borderColor: 'rgb(34, 197, 94)',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: isMobile ? 3 : 4,
-                        pointHoverRadius: isMobile ? 5 : 6,
-                        borderDash: [5, 5]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' MT';
-                                }
-                            },
-                            titleFont: {
-                                size: isMobile ? 10 : 12
-                            },
-                            bodyFont: {
-                                size: isMobile ? 9 : 11
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: !isMobile,
-                                text: 'Production (MT)',
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    size: isMobile ? 9 : 11
-                                }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: !isMobile,
-                                text: 'Year',
-                                font: {
-                                    size: isMobile ? 10 : 12
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    size: isMobile ? 9 : 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            console.log('Both charts created successfully!');
-            console.log('Historical chart instance:', historicalChartInstance);
-            console.log('Forecast chart instance:', forecastChartInstance);
-        }
-
         // Tab Switching Function
         function switchTab(tab) {
             const predictionTab = document.getElementById('tab-prediction');
@@ -736,112 +514,12 @@
                 const result = await response.json();
                 
                 console.log('Forecast API Response:', result);
-                console.log('Forecast data:', result.forecast);
-                console.log('Historical data:', result.historical);
                 
                 if (result.success || response.ok) {
                     const forecast = result.forecast || result.data || [];
                     const metadata = result.metadata || {};
                     const historical = result.historical || {};
                     const trend = result.trend || {};
-                    
-                    // Prepare data for charts
-                    const forecastYears = forecast.map(item => item.year);
-                    const forecastProduction = forecast.map(item => item.production);
-                    
-                    // Try to get historical data from the response or generate sample data
-                    let historicalYears = [];
-                    let historicalProduction = [];
-                    
-                    // Check if historical data is in the response
-                    if (result.historical_data && Array.isArray(result.historical_data)) {
-                        historicalYears = result.historical_data.map(item => item.year);
-                        historicalProduction = result.historical_data.map(item => item.production);
-                        console.log('Using historical_data from response');
-                    } else if (result.historical && result.historical.yearly_data) {
-                        // Try to extract yearly data from historical object
-                        const yearlyData = result.historical.yearly_data;
-                        historicalYears = Object.keys(yearlyData).map(Number).sort();
-                        historicalProduction = historicalYears.map(year => yearlyData[year]);
-                        console.log('Using historical.yearly_data from response');
-                    } else if (historical.years_data && Array.isArray(historical.years_data)) {
-                        historicalYears = historical.years_data.map(item => item.year);
-                        historicalProduction = historical.years_data.map(item => item.production);
-                        console.log('Using historical.years_data array');
-                    } else {
-                        console.log('No historical data in response, fetching from top-crops API...');
-                        // Fetch from the top-crops API which has historical data
-                        try {
-                            const histResponse = await fetch('http://127.0.0.1:5000/api/top-crops', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    MUNICIPALITY: requestPayload.municipality
-                                })
-                            });
-                            
-                            if (histResponse.ok) {
-                                const histData = await histResponse.json();
-                                console.log('Top crops API response:', histData);
-                                
-                                // Find the selected crop in historical data
-                                if (histData.success && histData.historical_top5 && histData.historical_top5.crops) {
-                                    const cropData = histData.historical_top5.crops.find(
-                                        c => c.crop.toUpperCase() === requestPayload.crop.toUpperCase()
-                                    );
-                                    
-                                    if (cropData && cropData.yearly_data && cropData.yearly_data.by_year) {
-                                        const yearlyData = cropData.yearly_data.by_year;
-                                        historicalYears = Object.keys(yearlyData).map(Number).sort();
-                                        historicalProduction = historicalYears.map(year => yearlyData[year]);
-                                        console.log('Extracted historical data from top-crops:', { historicalYears, historicalProduction });
-                                    }
-                                }
-                            }
-                        } catch (error) {
-                            console.warn('Could not fetch from top-crops API:', error);
-                        }
-                        
-                        // Final fallback: use historical metadata to create visualization
-                        if (historicalYears.length === 0 && (historical.average || historical.last_production)) {
-                            console.log('Using fallback with historical metadata');
-                            historicalYears = Array.from({length: 10}, (_, i) => 2015 + i);
-                            const baseValue = historical.last_production || historical.average || 1000;
-                            // Create slight variation for visualization
-                            historicalProduction = historicalYears.map((year, i) => {
-                                const variation = (Math.sin(i) * 0.1 + 1); // ±10% variation
-                                return baseValue * variation;
-                            });
-                            console.log('Generated fallback data:', { historicalYears, historicalProduction });
-                        }
-                    }
-                    
-                    // Create comparison charts if we have both datasets
-                    if (historicalYears.length > 0 && historicalProduction.length > 0 && 
-                        forecastYears.length > 0 && forecastProduction.length > 0) {
-                        
-                        console.log('Creating charts with data:', {
-                            historical: { years: historicalYears, production: historicalProduction },
-                            forecast: { years: forecastYears, production: forecastProduction }
-                        });
-                        
-                        // Show the charts section
-                        document.getElementById('chartsSection').style.display = 'block';
-                        
-                        createComparisonCharts(
-                            { years: historicalYears, production: historicalProduction },
-                            { years: forecastYears, production: forecastProduction }
-                        );
-                    } else {
-                        console.warn('Insufficient data for charts:', {
-                            historical: { years: historicalYears.length, production: historicalProduction.length },
-                            forecast: { years: forecastYears.length, production: forecastProduction.length }
-                        });
-                        // Hide charts section if no data
-                        document.getElementById('chartsSection').style.display = 'none';
-                    }
                     
                     // Display summary card
                     let html = `
@@ -980,5 +658,7 @@
                 forecastSpinner.classList.add('hidden');
             }
         });
+
+        
     </script>
 </x-app-layout>
