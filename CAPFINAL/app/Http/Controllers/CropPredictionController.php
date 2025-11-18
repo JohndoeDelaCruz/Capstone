@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\CropPredictionService;
+use App\Models\CropProduction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CropPredictionController extends Controller
 {
@@ -230,6 +232,47 @@ class CropPredictionController extends Controller
             $result = $this->predictionService->forecast($request->all());
             
             return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get historical production data for comparison chart
+     */
+    public function historical(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'municipality' => 'required|string',
+            'crop' => 'required|string',
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
+        try {
+            // Fetch historical data from 2015 to 2024 (aggregated by year)
+            $historicalData = CropProduction::where('municipality', $request->municipality)
+                ->where('crop', $request->crop)
+                ->whereBetween('year', [2015, 2024])
+                ->select('year', DB::raw('SUM(production) as production'))
+                ->groupBy('year')
+                ->orderBy('year')
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $historicalData,
+                'municipality' => $request->municipality,
+                'crop' => $request->crop
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

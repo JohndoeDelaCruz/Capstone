@@ -35,7 +35,7 @@
                             <label for="municipalitySelect" class="text-xs lg:text-sm text-gray-600 whitespace-nowrap">Municipality:</label>
                             <select id="municipalitySelect" class="w-full sm:w-auto border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 text-xs lg:text-sm">
                                 <option value="LATRINIDAD">La Trinidad</option>
-                                <option value="BAGUIO">Baguio City</option>
+                                
                                 <option value="ITOGON">Itogon</option>
                                 <option value="SABLAN">Sablan</option>
                                 <option value="TUBA">Tuba</option>

@@ -5,6 +5,9 @@
         </h2>
     </x-slot>
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
@@ -250,6 +253,13 @@
                         <!-- Forecast Results Section -->
                         <div id="forecastResults" class="mt-8 hidden">
                             <h3 class="text-lg font-semibold mb-4 text-gray-900">Forecast Results</h3>
+                            
+                            <!-- Comparison Chart -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                                <h4 class="text-md font-semibold text-gray-800 mb-4">Historical vs Predicted Production Comparison</h4>
+                                <canvas id="comparisonChart" height="80"></canvas>
+                            </div>
+                            
                             <div id="forecastContent" class="space-y-4">
                                 <!-- Forecast results will be displayed here -->
                             </div>
@@ -469,6 +479,9 @@
             }
         });
 
+        // Global variable to store chart instance
+        let comparisonChartInstance = null;
+
         // Forecast Form Handler
         document.getElementById('forecastForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -484,6 +497,12 @@
             // Hide previous results/errors
             forecastResults.classList.add('hidden');
             forecastError.classList.add('hidden');
+            
+            // Destroy previous chart if exists
+            if (comparisonChartInstance) {
+                comparisonChartInstance.destroy();
+                comparisonChartInstance = null;
+            }
             
             // Show loading state
             forecastBtn.disabled = true;
@@ -520,6 +539,33 @@
                     const metadata = result.metadata || {};
                     const historical = result.historical || {};
                     const trend = result.trend || {};
+                    
+                    // Fetch historical data from database
+                    let historicalData = [];
+                    try {
+                        const historicalResponse = await fetch('{{ route('predictions.historical') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                municipality: requestPayload.municipality,
+                                crop: requestPayload.crop
+                            })
+                        });
+                        
+                        if (historicalResponse.ok) {
+                            const historicalResult = await historicalResponse.json();
+                            historicalData = historicalResult.data || [];
+                        }
+                    } catch (error) {
+                        console.error('Error fetching historical data:', error);
+                    }
+                    
+                    // Render comparison chart
+                    renderComparisonChart(historicalData, forecast);
                     
                     // Display summary card
                     let html = `
@@ -658,6 +704,167 @@
                 forecastSpinner.classList.add('hidden');
             }
         });
+
+        /**
+         * Render comparison chart with historical and forecast data
+         */
+        function renderComparisonChart(historicalData, forecastData) {
+            const ctx = document.getElementById('comparisonChart');
+            if (!ctx) return;
+            
+            // Prepare historical data (2015-2024)
+            // Data is already aggregated by year from the backend
+            const historicalYears = [];
+            const historicalProduction = [];
+            
+            // Create a map of year -> production
+            const yearlyDataMap = {};
+            historicalData.forEach(item => {
+                yearlyDataMap[item.year] = parseFloat(item.production || 0);
+            });
+            
+            // Fill in all years from 2015-2024
+            for (let year = 2015; year <= 2024; year++) {
+                historicalYears.push(year);
+                historicalProduction.push(yearlyDataMap[year] || null);
+            }
+            
+            // Prepare forecast data (2025-2030)
+            const forecastYears = forecastData.map(item => item.year);
+            const forecastProduction = forecastData.map(item => parseFloat(item.production));
+            
+            // Combine all years for x-axis
+            const allYears = [...historicalYears, ...forecastYears];
+            
+            // Create datasets with proper alignment
+            const historicalDataset = new Array(allYears.length).fill(null);
+            const forecastDataset = new Array(allYears.length).fill(null);
+            
+            // Fill historical values
+            historicalYears.forEach((year, idx) => {
+                const yearIndex = allYears.indexOf(year);
+                historicalDataset[yearIndex] = historicalProduction[idx];
+            });
+            
+            // Fill forecast values
+            forecastYears.forEach((year, idx) => {
+                const yearIndex = allYears.indexOf(year);
+                forecastDataset[yearIndex] = forecastProduction[idx];
+            });
+            
+            // Destroy existing chart
+            if (comparisonChartInstance) {
+                comparisonChartInstance.destroy();
+            }
+            
+            // Create new chart
+            comparisonChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: [
+                        {
+                            label: 'Historical Production (2015-2024)',
+                            data: historicalDataset,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3,
+                            spanGaps: false
+                        },
+                        {
+                            label: 'Predicted Production (2025-2030)',
+                            data: forecastDataset,
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3,
+                            spanGaps: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(2) + ' MT';
+                                    } else {
+                                        label += 'No data';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: true,
+                                drawBorder: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Production (MT)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                drawBorder: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + ' MT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         
     </script>

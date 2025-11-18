@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/predict', [CropPredictionController::class, 'index'])->name('predictions.predict.form');
         Route::post('/predict', [CropPredictionController::class, 'predict'])->name('predictions.predict');
         Route::post('/forecast', [CropPredictionController::class, 'forecast'])->name('predictions.forecast');
+        Route::post('/historical', [CropPredictionController::class, 'historical'])->name('predictions.historical');
         Route::post('/batch-predict', [CropPredictionController::class, 'batchPredict'])->name('predictions.batch');
         Route::get('/history', [CropPredictionController::class, 'history'])->name('predictions.history');
         Route::get('/options', [CropPredictionController::class, 'getOptions'])->name('predictions.options');
